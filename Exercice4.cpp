@@ -53,7 +53,6 @@ class Exercice4{
 			valarray<double> a(0., 6);
 			
 			v = y[slice(6,6,1)];
-			cout<<"acc1"<<endl;
 			
 			if ((m1==0) || (m2==0) || (m3==0)) {		// si un des 3 masse est 0, on calcule ainsi
 				a[0] = G*m2*(y[2]-y[0])/(pow(dist(y[0], y[2], y[1], y[3]),3));
@@ -62,7 +61,6 @@ class Exercice4{
 				a[3] = G*m1*(y[1]-y[3])/(pow(dist(y[0], y[2], y[1], y[3]),3));
 				a[4] = 0;
 				a[5] = 0;
-				cout<<"acc2"<<endl;
 			} else {									// si les trois masses sont differents de 0, alors:
 				a[0] = G*m2*(y[2]-y[0])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[4]-y[0])/(pow(dist(y[0], y[4], y[1], y[5]),3));	// acceleration sur x de la masse 1
 				a[1] = G*m2*(y[3]-y[1])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[5]-y[1])/(pow(dist(y[0], y[4], y[1], y[5]),3));	// acceleration sur y de la masse 1
@@ -72,12 +70,23 @@ class Exercice4{
 				a[5] = G*m1*(y[1]-y[5])/(pow(dist(y[0], y[4], y[1], y[5]),3)) +  G*m2*(y[3]-y[5])/(pow(dist(y[4], y[2], y[5], y[3]),3));	// acceleration sur y de la masse 3
 			}
 			
-			valarray<double> f(12);
-			cout<<"acc3"<<endl;
-
-			f[slice(0,5,1)] = v;
-			f[slice(6,11,1)] = a;
-			cout<<"acc4"<<endl;
+			valarray<double> f(0., 12);
+			
+			/* Au lieu d'utiliser la fonction slice suivante
+			 * 	f[slice(0,5,1)] = v;
+			 * 	f[slice(6,11,1)] = a;
+			 * on est forcé à utiliser la boucle for usuelle, car le programme
+			 * nous donne un problème d'allocation de la mémoire qu'on arrive
+			 * pas à résoudre autrement!
+			 */
+			
+			for (int i(0); i<12; i++) {
+				if(i<6) {
+					f[i] = v[i];
+				} else {
+					f[i] = a[i];
+				}
+			}
 			
 			return f;
 		}
@@ -97,14 +106,9 @@ class Exercice4{
 			valarray<double> k2(0., 12);
 			valarray<double> k3(0., 12);
 			valarray<double> k4(0., 12);
-			cout<<"step1"<<endl;
 			
 			k1 = deltat*acceleration(y, t);
-			cout<<"step2"<<endl;
-			
 			k2 = deltat*acceleration(y + 0.5*k1, t + deltat*0.5);
-			cout<<"step3"<<endl;
-			
 			k3 = deltat*acceleration(y + 0.5*k2, t + deltat*0.5);
 			k4 = deltat*acceleration(y + k3, t + deltat);
 			y = y + (k1 + 2.*k2 + 2.*k3 + k4)/6.;
@@ -157,14 +161,14 @@ class Exercice4{
 				Y[11]    = configFile.get<double>("vy03");
 				sampling = configFile.get<int>("sampling");
 				epsilon  = configFile.get<double>("epsilon");
-				
-				cout << "Utiliser le pas de temps adaptatif (1 si oui, 0 sinon)? " ;
-				cin >> adaptatif;
     
 			// Ouverture du fichier de sortie
 		
 			outputFile = new ofstream(configFile.get<string>("output").c_str());
 			outputFile->precision(15);
+			
+				cout << "Utiliser le pas de temps adaptatif (1 si oui, 0 sinon)? " ;
+				cin >> adaptatif;
 		};
 		
 			// Destructeur  
@@ -197,11 +201,11 @@ class Exercice4{
 					
 					if (d<epsilon){
 						dt = dt * pow(epsilon/d,1./5.);
-						dt = min(tFin-t, dt);
+						dt = min(tFin-t, dt);							// permet de ne pas dépasser tFin
 					} else { 
 						do {	
 						dt = 0.99 * dt * pow(epsilon/d,1./5.);
-						dt = min(tFin-t, dt);
+						dt = min(tFin-t, dt);							// permet de ne pas dépasser tFin
 						
 						step(Y, dt);
 						step(Yprim, dt*0.5);
@@ -222,7 +226,6 @@ class Exercice4{
 		};
 		
 };
-
 
 //-------------------------------MAIN----------------------------------
 int main(int argc, char* argv[]) 

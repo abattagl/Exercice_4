@@ -1,4 +1,4 @@
-	% Parametres physiques :
+% Parametres physiques :
 tFin     = 9e9
 m1       = 1e9
 m2       = 1.98892e30
