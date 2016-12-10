@@ -18,7 +18,7 @@ vy3 = output(:,13);
 clear output
 
 figure
-plot(x1, y1, x2, y2)
+plot(x1, y1, 'b', x2, y2, 'r')
 xlabel('x [m]')
 ylabel('y [m]')
 
