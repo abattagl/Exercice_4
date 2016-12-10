@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iomanip>
 #include <valarray>
+#include <algorithm>
 #include "ConfigFile.tpp" // Fichier .tpp car inclut un template
 
 using namespace std;
@@ -16,6 +17,7 @@ class Exercice4{
 		double t,dt,tFin;
 		double m1,m2,m3;
 		double epsilon;
+		bool adaptatif;
 		valarray<double> Y;
 		int sampling;
 		int last;
@@ -48,35 +50,30 @@ class Exercice4{
 			// Fonctions necessaires pour la fonction step()
 		valarray<double> acceleration(valarray<double> y, double tictac){
 			valarray<double> v(0., 6);
-		//	cout<<"fonction1"<<endl;
 			valarray<double> a(0., 6);
-		//	cout<<"fonction2"<<endl;
+			
 			v = y[slice(6,6,1)];
-		//	cout<<"fonction3"<<endl;
-			a[0] = G*m2*(y[2]-y[0])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[4]-y[0])/(pow(dist(y[0], y[4], y[1], y[5]),3));	// acceleration sur x de la masse 1
-		//	cout<<"fonction4"<<endl;
-			a[1] = G*m2*(y[3]-y[1])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[5]-y[1])/(pow(dist(y[0], y[4], y[1], y[5]),3));	// acceleration sur y de la masse 1
-		//	cout<<"fonction5"<<endl;
-			a[2] = G*m1*(y[0]-y[2])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[4]-y[2])/(pow(dist(y[2], y[4], y[3], y[5]),3));	// acceleration sur x de la masse 2
-		//	cout<<"fonction6"<<endl;
-			a[3] = G*m1*(y[1]-y[3])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[5]-y[3])/(pow(dist(y[2], y[4], y[3], y[5]),3));	// acceleration sur y de la masse 2
-		//	cout<<"fonction7"<<endl;
-			a[4] = G*m1*(y[0]-y[4])/(pow(dist(y[4], y[0], y[5], y[1]),3)) +  G*m2*(y[2]-y[4])/(pow(dist(y[4], y[2], y[3], y[5]),3));	// acceleration sur x de la masse 3
-		//	cout<<"fonction8"<<endl;
-			a[5] = G*m1*(y[1]-y[5])/(pow(dist(y[0], y[4], y[1], y[5]),3)) +  G*m2*(y[3]-y[5])/(pow(dist(y[4], y[2], y[5], y[3]),3));	// acceleration sur y de la masse 3
-		//	cout<<"fonction9"<<endl;
-		//	for (size_t i(0); i<a.size(); i++){
-		//		cout << i << ": " << a[i] << " " << endl;
-		//	}
-		//	for (size_t i(0); i<v.size(); i++){
-		//		cout << i << ": " << v[i] << " " << endl;
-		//	}
+			
+			if ((m1==0) || (m2==0) || (m3==0)) {		// si un des 3 masse est 0, on calcule ainsi
+				a[0] = G*m2*(y[2]-y[0])/(pow(dist(y[0], y[2], y[1], y[3]),3));
+				a[1] = G*m2*(y[3]-y[1])/(pow(dist(y[0], y[2], y[1], y[3]),3));
+				a[2] = G*m1*(y[0]-y[2])/(pow(dist(y[0], y[2], y[1], y[3]),3));
+				a[3] = G*m1*(y[1]-y[3])/(pow(dist(y[0], y[2], y[1], y[3]),3));
+				a[4] = 0;
+				a[5] = 0;
+			} else {									// si les trois masses sont differents de 0, alors:
+				a[0] = G*m2*(y[2]-y[0])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[4]-y[0])/(pow(dist(y[0], y[4], y[1], y[5]),3));	// acceleration sur x de la masse 1
+				a[1] = G*m2*(y[3]-y[1])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[5]-y[1])/(pow(dist(y[0], y[4], y[1], y[5]),3));	// acceleration sur y de la masse 1
+				a[2] = G*m1*(y[0]-y[2])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[4]-y[2])/(pow(dist(y[2], y[4], y[3], y[5]),3));	// acceleration sur x de la masse 2
+				a[3] = G*m1*(y[1]-y[3])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[5]-y[3])/(pow(dist(y[2], y[4], y[3], y[5]),3));	// acceleration sur y de la masse 2
+				a[4] = G*m1*(y[0]-y[4])/(pow(dist(y[4], y[0], y[5], y[1]),3)) +  G*m2*(y[2]-y[4])/(pow(dist(y[4], y[2], y[3], y[5]),3));	// acceleration sur x de la masse 3
+				a[5] = G*m1*(y[1]-y[5])/(pow(dist(y[0], y[4], y[1], y[5]),3)) +  G*m2*(y[3]-y[5])/(pow(dist(y[4], y[2], y[5], y[3]),3));	// acceleration sur y de la masse 3
+			}
+			
 			valarray<double> f(12);
-		//	cout<<"fonction10"<<endl;
+
 			f[slice(0,5,1)] = v;
-		//	cout<<"fonction11"<<endl;
 			f[slice(6,11,1)] = a;
-		//	cout<<"fonction12"<<endl;
 			
 			return f;
 		}
@@ -84,7 +81,7 @@ class Exercice4{
 		double dist(double x1, double x2, double y1, double y2){
 			double d(sqrt(pow(x1-x2,2) + pow(y1-y2,2)));
 			if (d == 0) {
-			//	cout << "Division par zero dans la distance!!" << endl;
+				cout << "Division par zero dans la distance!!" << endl;
 				return 1;
 			}	
 			return d;
@@ -97,23 +94,20 @@ class Exercice4{
 			valarray<double> k2(0., 12);
 			valarray<double> k3(0., 12);
 			valarray<double> k4(0., 12);
-			cout<<"step2"<<endl;
+			
 			k1 = deltat*acceleration(y, t);
-		//	for (size_t i(0); i<k1.size(); i++){
-		//		cout << i << ": " << k1[i] << " " << endl;
-		//	}
+			cout<<"step2"<<endl;
+			
 			k2 = deltat*acceleration(y + 0.5*k1, t + deltat*0.5);
-		//	cout<<"acc2"<<endl;
+			cout<<"step3"<<endl;
+			
 			k3 = deltat*acceleration(y + 0.5*k2, t + deltat*0.5);
-		//	cout<<"acc3"<<endl;
 			k4 = deltat*acceleration(y + k3, t + deltat);
-		//	cout<<"acc4"<<endl;
 			y = y + (k1 + 2.*k2 + 2.*k3 + k4)/6.;
-		//	cout<<"step3"<<endl;
 		}
 		
 			// restitue le max
-		double max(double a, double b, double c){
+		double maximum(double a, double b, double c){
 			if(a>=b && a>=c){
 				return a;
 			} else { if (b>=a && b>=c){
@@ -158,12 +152,15 @@ class Exercice4{
 				Y[10]    = configFile.get<double>("vx03");
 				Y[11]    = configFile.get<double>("vy03");
 				sampling = configFile.get<int>("sampling");
+				epsilon  = configFile.get<double>("epsilon");
+				
+				cout << "Utiliser le pas de temps adaptatif (1 si oui, 0 sinon)? " ;
+				cin >> adaptatif;
     
 			// Ouverture du fichier de sortie
 		
 			outputFile = new ofstream(configFile.get<string>("output").c_str());
 			outputFile->precision(15);
-		//	cout<<"ici est le probleme"<<endl;
 		};
 		
 			// Destructeur  
@@ -177,58 +174,45 @@ class Exercice4{
 			last = 0;
 			t = 0;
 			printOut(true);
-			cout<< "Hello\n";
 			
-			while( t<(tFin) ) {
+			while(t<tFin) {
 				valarray<double> Yprim(Y);
 				double d1, d2, d3, d ;
 				
-			cout<<"ici1 " << t <<endl;
-				
 				step(Y, dt);
-		//	cout<<"ici2"<<endl;
-				step(Yprim, dt*0.5);
-				step(Yprim, dt*0.5);
-					// if
-					
-				d1 = sqrt(pow(Y[0]-Yprim[0],2) + pow(Y[1]-Yprim[1],2));	
-				d2 = sqrt(pow(Y[2]-Yprim[2],2) + pow(Y[3]-Yprim[3],2));	
-				d3 = sqrt(pow(Y[4]-Yprim[4],2) + pow(Y[5]-Yprim[5],2));
 				
-		//		cout<<"ici3"<<endl;
-				
-				d = max(d1, d2, d3);
-				
-		//		cout<<"ici4"<<endl;
-				
-				if (d<epsilon){
-					dt = dt * pow(epsilon/d,1./5.);
-					cout<<"ici5-boucle1"<<endl;
-				} else { 
-					do {	
-					dt = 0.99 * dt * pow(epsilon/d,1./5.);
-					
-		//			cout<<"ici7-boucle3"<<endl;
-					
-					step(Y, dt);
+				if (adaptatif){
 					step(Yprim, dt*0.5);
 					step(Yprim, dt*0.5);
-					
-		//		cout<<"ici8-boucle4"<<endl;
-					
+						
 					d1 = sqrt(pow(Y[0]-Yprim[0],2) + pow(Y[1]-Yprim[1],2));	
 					d2 = sqrt(pow(Y[2]-Yprim[2],2) + pow(Y[3]-Yprim[3],2));	
 					d3 = sqrt(pow(Y[4]-Yprim[4],2) + pow(Y[5]-Yprim[5],2));
 					
+					d = maximum(d1, d2, d3);
 					
-					} while (d > epsilon);
+					if (d<epsilon){
+						dt = dt * pow(epsilon/d,1./5.);
+						dt = min(tFin-t, dt);
+					} else { 
+						do {	
+						dt = 0.99 * dt * pow(epsilon/d,1./5.);
+						dt = min(tFin-t, dt);
+						
+						step(Y, dt);
+						step(Yprim, dt*0.5);
+						step(Yprim, dt*0.5);
+						
+						d1 = sqrt(pow(Y[0]-Yprim[0],2) + pow(Y[1]-Yprim[1],2));	
+						d2 = sqrt(pow(Y[2]-Yprim[2],2) + pow(Y[3]-Yprim[3],2));	
+						d3 = sqrt(pow(Y[4]-Yprim[4],2) + pow(Y[5]-Yprim[5],2));
+						
+						} while (d > epsilon);
+					}
 				}
-	//		cout<<"ici10"<<endl;
 				t += dt;
-			cout<<"ici10/2"<<endl;
 				printOut(false);
 			}
-			cout<<"ici11"<<endl;
 			printOut(true);
 			
 		};

@@ -19,4 +19,5 @@ vy03     = 1.
 % Parametres numeriques :
 dt       = 1e5
 sampling = 1
-output   = Poincare2-1000.dat
+epsilon  = 1e2
+output   = Prova.dat
