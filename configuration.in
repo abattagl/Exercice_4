@@ -1,22 +1,22 @@
-% Parametres physiques :
-tFin     = 90000.
-m1       = 1.
-m2       = 1.
-m3       = 1.
-x01      = 1.
-y01      = 1.
-x02      = 1.
-y02      = 1.
-x03      = 1.
-y03      = 1.
-vx01	 = 1.
-vy01	 = 1.
-vx02	 = 1.
-vy02	 = 1.
-vx03	 = 1.
-vy03	 = 1.
+	% Parametres physiques :
+tFin     = 9e9
+m1       = 1e9
+m2       = 1.98892e30
+m3       = 0.
+x01      = 4544.2e6
+y01      = 0.
+x02      = 0.
+y02      = 0.
+x03      = 0.
+y03      = 0.
+vx01     = 1.
+vy01     = 1.
+vx02     = 1.
+vy02     = 1.
+vx03     = 1.
+vy03     = 1.
 
 % Parametres numeriques :
-dt       = 8.971402931e-3
-sampling = 1000
+dt       = 1e5
+sampling = 1
 output   = Poincare2-1000.dat
