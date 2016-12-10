@@ -166,9 +166,27 @@ class Exercice4{
 		
 			outputFile = new ofstream(configFile.get<string>("output").c_str());
 			outputFile->precision(15);
-			
-				cout << "Utiliser le pas de temps adaptatif (1 si oui, 0 sinon)? " ;
-				cin >> adaptatif;
+				
+				
+				int n;
+				bool sortir;
+				do {
+					cout << "Utiliser le pas de temps adaptatif (1 si oui, 0 sinon)? " ;
+					cin >> n;
+					
+					if (n==0) {
+						adaptatif = false;
+						sortir = false;
+						cout << "Choisi: pas de temps fixe" << endl;
+					} else if (n==1) {
+						adaptatif = true;
+						sortir = false;
+						cout << "Choisi: pas de temps adaptatif" << endl;
+					} else {
+						sortir = true;
+						cout << "Le choi a faire est soit 0 soit 1" << endl;
+					}
+				} while (sortir);
 		};
 		
 			// Destructeur  

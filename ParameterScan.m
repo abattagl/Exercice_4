@@ -11,7 +11,7 @@
 %%%%%%%%%%%%%%%%
 
 repertoire = './'; % Chemin d'acces au code compile
-executable = 'Exercice3'; % Nom de l'executable
+executable = 'Exercice4'; % Nom de l'executable
 input = 'configuration.in'; % Nom du fichier d'entree
 
 nsimul = 10; % Nombre de simulations a faire
