@@ -53,6 +53,7 @@ class Exercice4{
 			valarray<double> a(0., 6);
 			
 			v = y[slice(6,6,1)];
+			cout<<"acc1"<<endl;
 			
 			if ((m1==0) || (m2==0) || (m3==0)) {		// si un des 3 masse est 0, on calcule ainsi
 				a[0] = G*m2*(y[2]-y[0])/(pow(dist(y[0], y[2], y[1], y[3]),3));
@@ -61,6 +62,7 @@ class Exercice4{
 				a[3] = G*m1*(y[1]-y[3])/(pow(dist(y[0], y[2], y[1], y[3]),3));
 				a[4] = 0;
 				a[5] = 0;
+				cout<<"acc2"<<endl;
 			} else {									// si les trois masses sont differents de 0, alors:
 				a[0] = G*m2*(y[2]-y[0])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[4]-y[0])/(pow(dist(y[0], y[4], y[1], y[5]),3));	// acceleration sur x de la masse 1
 				a[1] = G*m2*(y[3]-y[1])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[5]-y[1])/(pow(dist(y[0], y[4], y[1], y[5]),3));	// acceleration sur y de la masse 1
@@ -71,9 +73,11 @@ class Exercice4{
 			}
 			
 			valarray<double> f(12);
+			cout<<"acc3"<<endl;
 
 			f[slice(0,5,1)] = v;
 			f[slice(6,11,1)] = a;
+			cout<<"acc4"<<endl;
 			
 			return f;
 		}
@@ -88,12 +92,12 @@ class Exercice4{
 		}
 		
 			// step() pour Runge-Kutta 4
-		void step(valarray<double> y, double deltat){
-			cout<<"step1"<<endl;
+		void step(valarray<double> & y, double deltat){
 			valarray<double> k1(0., 12);
 			valarray<double> k2(0., 12);
 			valarray<double> k3(0., 12);
 			valarray<double> k4(0., 12);
+			cout<<"step1"<<endl;
 			
 			k1 = deltat*acceleration(y, t);
 			cout<<"step2"<<endl;
@@ -176,12 +180,12 @@ class Exercice4{
 			printOut(true);
 			
 			while(t<tFin) {
-				valarray<double> Yprim(Y);
-				double d1, d2, d3, d ;
-				
 				step(Y, dt);
 				
 				if (adaptatif){
+					valarray<double> Yprim(Y);
+					double d1, d2, d3, d ;
+					
 					step(Yprim, dt*0.5);
 					step(Yprim, dt*0.5);
 						
