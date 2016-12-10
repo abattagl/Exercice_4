@@ -9,15 +9,15 @@ x02      = 0.
 y02      = 0.
 x03      = 0.
 y03      = 0.
-vx01     = 1.
-vy01     = 1.
-vx02     = 1.
-vy02     = 1.
-vx03     = 1.
-vy03     = 1.
+vx01     = 0.
+vy01     = 29791.62093
+vx02     = 0.
+vy02     = 0.
+vx03     = 0.
+vy03     = 0.
 
 % Parametres numeriques :
 dt       = 1e5
 sampling = 1
 epsilon  = 1e2
-output   = Prova.dat
+output   = outputTraj4-2-a.dat
