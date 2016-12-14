@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const double G(6.674e-11);
+const double G(6.674*pow(10,-20));
 
 //--------------------DEFINITIONS CLASSES----------------------------
 class Exercice4{
@@ -48,51 +48,45 @@ class Exercice4{
 		}
 		
 			// Fonctions necessaires pour la fonction step()
-		valarray<double> acceleration(valarray<double> y, double tictac){
-			valarray<double> v(0., 6);
-			valarray<double> a(0., 6);
+		valarray<double> acceleration(valarray<double> y){
+			valarray<double> f; f.resize(12);
 			
-			v = y[slice(6,6,1)];
+			/* On calcule chaque terme à la main car la fonction slice nous donne
+			 * un poroblème d'allocation de la memoire
+			 * */
 			
 			if ((m1==0) || (m2==0) || (m3==0)) {		// si un des 3 masse est 0, on calcule ainsi
-				a[0] = G*m2*(y[2]-y[0])/(pow(dist(y[0], y[2], y[1], y[3]),3));
-				a[1] = G*m2*(y[3]-y[1])/(pow(dist(y[0], y[2], y[1], y[3]),3));
-				a[2] = G*m1*(y[0]-y[2])/(pow(dist(y[0], y[2], y[1], y[3]),3));
-				a[3] = G*m1*(y[1]-y[3])/(pow(dist(y[0], y[2], y[1], y[3]),3));
-				a[4] = 0;
-				a[5] = 0;
-			} else {									// si les trois masses sont differents de 0, alors:
-				a[0] = G*m2*(y[2]-y[0])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[4]-y[0])/(pow(dist(y[0], y[4], y[1], y[5]),3));	// acceleration sur x de la masse 1
-				a[1] = G*m2*(y[3]-y[1])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[5]-y[1])/(pow(dist(y[0], y[4], y[1], y[5]),3));	// acceleration sur y de la masse 1
-				a[2] = G*m1*(y[0]-y[2])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[4]-y[2])/(pow(dist(y[2], y[4], y[3], y[5]),3));	// acceleration sur x de la masse 2
-				a[3] = G*m1*(y[1]-y[3])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[5]-y[3])/(pow(dist(y[2], y[4], y[3], y[5]),3));	// acceleration sur y de la masse 2
-				a[4] = G*m1*(y[0]-y[4])/(pow(dist(y[4], y[0], y[5], y[1]),3)) +  G*m2*(y[2]-y[4])/(pow(dist(y[4], y[2], y[3], y[5]),3));	// acceleration sur x de la masse 3
-				a[5] = G*m1*(y[1]-y[5])/(pow(dist(y[0], y[4], y[1], y[5]),3)) +  G*m2*(y[3]-y[5])/(pow(dist(y[4], y[2], y[5], y[3]),3));	// acceleration sur y de la masse 3
+				f[0] = y[6];
+				f[1] = y[7];
+				f[2] = y[8];
+				f[3] = y[9];
+				f[4] = 0.;
+				f[5] = 0.;
+				f[6] = G*m2*(y[2]-y[0])/(pow(dist(y[0], y[2], y[1], y[3]),3));
+				f[7] = G*m2*(y[3]-y[1])/(pow(dist(y[0], y[2], y[1], y[3]),3));
+				f[8] = G*m1*(y[0]-y[2])/(pow(dist(y[0], y[2], y[1], y[3]),3));
+				f[9] = G*m1*(y[1]-y[3])/(pow(dist(y[0], y[2], y[1], y[3]),3));
+				f[10] = 0;
+				f[11] = 0;
+			} else {
+				f[0] = y[6];
+				f[1] = y[7];
+				f[2] = y[8];
+				f[3] = y[9];
+				f[4] = y[10];
+				f[5] = y[11];
+				f[6] = G*m2*(y[2]-y[0])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[4]-y[0])/(pow(dist(y[0], y[4], y[1], y[5]),3));	// acceleration sur x de la masse 1
+				f[7] = G*m2*(y[3]-y[1])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[5]-y[1])/(pow(dist(y[0], y[4], y[1], y[5]),3));	// acceleration sur y de la masse 1
+				f[8] = G*m1*(y[0]-y[2])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[4]-y[2])/(pow(dist(y[2], y[4], y[3], y[5]),3));	// acceleration sur x de la masse 2
+				f[9] = G*m1*(y[1]-y[3])/(pow(dist(y[0], y[2], y[1], y[3]),3)) +  G*m3*(y[5]-y[3])/(pow(dist(y[2], y[4], y[3], y[5]),3));	// acceleration sur y de la masse 2
+				f[10] = G*m1*(y[0]-y[4])/(pow(dist(y[4], y[0], y[5], y[1]),3)) +  G*m2*(y[2]-y[4])/(pow(dist(y[4], y[2], y[3], y[5]),3));	// acceleration sur x de la masse 3
+				f[11] = G*m1*(y[1]-y[5])/(pow(dist(y[0], y[4], y[1], y[5]),3)) +  G*m2*(y[3]-y[5])/(pow(dist(y[4], y[2], y[5], y[3]),3));	// acceleration sur y de la masse 3
 			}
-			
-			valarray<double> f(0., 12);
-			
-			/* Au lieu d'utiliser la fonction slice suivante
-			 * 	f[slice(0,5,1)] = v;
-			 * 	f[slice(6,11,1)] = a;
-			 * on est forcé à utiliser la boucle for usuelle, car le programme
-			 * nous donne un problème d'allocation de la mémoire qu'on arrive
-			 * pas à résoudre autrement!
-			 */
-			
-			for (int i(0); i<12; i++) {
-				if(i<6) {
-					f[i] = v[i];
-				} else {
-					f[i] = a[i];
-				}
-			}
-			
 			return f;
 		}
 		
 		double dist(double x1, double x2, double y1, double y2){
-			double d(sqrt(pow(x1-x2,2) + pow(y1-y2,2)));
+			double d(sqrt(pow(x1-x2,2.) + pow(y1-y2,2.)));
 			if (d == 0) {
 				cout << "Division par zero dans la distance!!" << endl;
 				return 1;
@@ -101,16 +95,16 @@ class Exercice4{
 		}
 		
 			// step() pour Runge-Kutta 4
-		void step(valarray<double> & y, double deltat){
-			valarray<double> k1(0., 12);
-			valarray<double> k2(0., 12);
-			valarray<double> k3(0., 12);
-			valarray<double> k4(0., 12);
+		void step(valarray<double> &y, double deltat){
+			valarray<double> k1; k1.resize(12);
+			valarray<double> k2; k2.resize(12);
+			valarray<double> k3; k3.resize(12);
+			valarray<double> k4; k4.resize(12);
 			
-			k1 = deltat*acceleration(y, t);
-			k2 = deltat*acceleration(y + 0.5*k1, t + deltat*0.5);
-			k3 = deltat*acceleration(y + 0.5*k2, t + deltat*0.5);
-			k4 = deltat*acceleration(y + k3, t + deltat);
+			k1 = deltat*acceleration(y);
+			k2 = deltat*acceleration(y + 0.5*k1);
+			k3 = deltat*acceleration(y + 0.5*k2);
+			k4 = deltat*acceleration(y + k3);
 			y = y + (k1 + 2.*k2 + 2.*k3 + k4)/6.;
 		}
 		
@@ -134,7 +128,7 @@ class Exercice4{
 		{
     
 			string inputPath("configuration.in"); // Fichier d'input par defaut
-			if(argc>1) // Fichier d'input specifie par l'utilisateur ("./Exercice3 config_perso.in")
+			if(argc>1) // Fichier d'input specifie par l'utilisateur ("./Exercice4 config_perso.in")
 				inputPath = argv[1];
 
 				ConfigFile configFile(inputPath); // Les parametres sont lus et stockes dans une "map" de strings.
@@ -238,6 +232,7 @@ class Exercice4{
 				}
 				t += dt;
 				printOut(false);
+				//printOut(true);
 			}
 			printOut(true);
 			

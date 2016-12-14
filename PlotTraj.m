@@ -19,6 +19,7 @@ clear output
 
 figure
 plot(x1, y1, 'b', x2, y2, 'r')
+axis equal
 xlabel('x [m]')
 ylabel('y [m]')
 
