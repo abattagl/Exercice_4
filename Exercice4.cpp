@@ -34,7 +34,7 @@ class Exercice4{
 				for (size_t i(0); i<Y.size(); ++i){
 					*outputFile << Y[i] << " ";
 				}				
-				*outputFile << endl;
+				*outputFile << energie() << endl;
 
 				last=1;
 			}else{
@@ -43,8 +43,21 @@ class Exercice4{
 		};
 		
 			// Fonction qui calcule l'énergie
-		void energie(){ 
+		double energie(){ 
+			double Epot1, Epot3;
+			double Ecin1, Ecin2, Ecin3;
+			double Epot, Ecin;
 			
+			Epot1= G*m1*m2/(dist(Y[0], Y[2], Y[1], Y[3]));
+			Epot3= G*m1*m3/(dist(Y[0], Y[4], Y[1], Y[5])) + G*m2*m3/(dist(Y[2], Y[4], Y[3], Y[5]));
+			Epot=Epot1+Epot3;
+			
+			Ecin1= 0.5*m1*(pow(Y[6],2.)+pow(Y[7],2.));
+			Ecin2= 0.5*m1*(pow(Y[8],2.)+pow(Y[9],2.));	
+			Ecin3= 0.5*m1*(pow(Y[10],2.)+pow(Y[11],2.));	
+			Ecin= Ecin1+ Ecin2 +Ecin3;
+			
+			return Epot+Ecin;
 		}
 		
 			// Fonctions necessaires pour la fonction step()
@@ -88,7 +101,7 @@ class Exercice4{
 		double dist(double x1, double x2, double y1, double y2){
 			double d(sqrt(pow(x1-x2,2.) + pow(y1-y2,2.)));
 			if (d == 0) {
-				cout << "Division par zero dans la distance!!" << endl;
+				//cout << "Division par zero dans la distance!!" << endl;
 				return 1;
 			}	
 			return d;
@@ -161,7 +174,6 @@ class Exercice4{
 			outputFile = new ofstream(configFile.get<string>("output").c_str());
 			outputFile->precision(15);
 				
-				
 				int n;
 				bool sortir;
 				do {
@@ -232,9 +244,19 @@ class Exercice4{
 				}
 				t += dt;
 				printOut(false);
-				//printOut(true);
+				
+				if(t>tFin){	// Permet de sauvgarder les differentes valeurs au temps tFin
+					if(adaptatif){
+						// À COMPLETER: pour le temps finale pour le dt adaptatif
+					} else {
+						t = tFin;
+						step(Y, dt);
+						printOut(true);
+					}
+				}
+				
 			}
-			printOut(true);
+			//printOut(true);
 			
 		};
 		

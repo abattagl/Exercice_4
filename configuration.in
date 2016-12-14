@@ -1,5 +1,5 @@
 % Parametres physiques :
-tFin     = 2e9
+tFin     = 1911137158
 m1       = 1e9
 m2       = 1.98892e30
 m3       = 0.
@@ -17,7 +17,7 @@ vx03     = 0.
 vy03     = 0.
 
 % Parametres numeriques :
-dt       = 10000
+dt       = 5000
 sampling = 1
 epsilon  = 1e2
 output   = outputTraj4-2-a.dat
